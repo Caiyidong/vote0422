@@ -1,0 +1,82 @@
+{% extends 'base.html' %}
+{% block title %}投票管理 - 后台{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h3 class="fw-bold mb-0"><i class="bi bi-list-check me-2 text-primary"></i>投票管理</h3>
+    <a href="{{ url_for('admin.create_poll') }}" class="btn btn-primary">
+        <i class="bi bi-plus-lg me-1"></i>创建新投票
+    </a>
+</div>
+
+<div class="card shadow-sm border-0">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0 align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>ID</th><th>标题</th><th>状态</th><th>总票数</th>
+                        <th>截止时间</th><th>创建时间</th><th>操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for poll in polls.items %}
+                    <tr>
+                        <td class="text-muted">{{ poll.id }}</td>
+                        <td>
+                            <a href="{{ url_for('vote.poll_detail', poll_id=poll.id) }}" class="fw-semibold text-decoration-none">
+                                {{ poll.title }}
+                            </a>
+                        </td>
+                        <td>
+                            {% if not poll.is_active %}
+                                <span class="badge bg-secondary">已关闭</span>
+                            {% elif poll.is_expired %}
+                                <span class="badge bg-danger">已截止</span>
+                            {% else %}
+                                <span class="badge bg-success">进行中</span>
+                            {% endif %}
+                        </td>
+                        <td><strong>{{ poll.total_votes }}</strong></td>
+                        <td><small class="text-muted">{{ poll.end_time.strftime('%Y-%m-%d %H:%M') if poll.end_time else '永不截止' }}</small></td>
+                        <td><small class="text-muted">{{ poll.created_at.strftime('%Y-%m-%d') }}</small></td>
+                        <td>
+                            <div class="d-flex gap-1">
+                                <a href="{{ url_for('vote.poll_result', poll_id=poll.id) }}" class="btn btn-sm btn-outline-info" title="查看结果">
+                                    <i class="bi bi-bar-chart"></i>
+                                </a>
+                                <a href="{{ url_for('admin.edit_poll', poll_id=poll.id) }}" class="btn btn-sm btn-outline-secondary" title="编辑">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                                <form method="post" action="{{ url_for('admin.delete_poll', poll_id=poll.id) }}" onsubmit="return confirm('确认删除该投票？此操作不可恢复！')">
+                                    <button type="submit" class="btn btn-sm btn-outline-danger" title="删除">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- 分页 -->
+{% if polls.pages > 1 %}
+<nav class="mt-4">
+    <ul class="pagination justify-content-center">
+        {% if polls.has_prev %}<li class="page-item"><a class="page-link" href="?page={{ polls.prev_num }}">上一页</a></li>{% endif %}
+        {% for p in polls.iter_pages() %}
+            {% if p %}
+            <li class="page-item {% if p == polls.page %}active{% endif %}"><a class="page-link" href="?page={{ p }}">{{ p }}</a></li>
+            {% else %}
+            <li class="page-item disabled"><span class="page-link">…</span></li>
+            {% endif %}
+        {% endfor %}
+        {% if polls.has_next %}<li class="page-item"><a class="page-link" href="?page={{ polls.next_num }}">下一页</a></li>{% endif %}
+    </ul>
+</nav>
+{% endif %}
+{% endblock %}

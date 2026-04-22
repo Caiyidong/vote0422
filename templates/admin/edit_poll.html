@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+{% block title %}编辑投票 - 后台{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-7">
+        <h3 class="fw-bold mb-4"><i class="bi bi-pencil-square me-2 text-primary"></i>编辑投票</h3>
+        <div class="card shadow-sm border-0">
+            <div class="card-body p-4">
+                <form method="post">
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">投票标题</label>
+                        <input type="text" name="title" class="form-control" value="{{ poll.title }}" required maxlength="200">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">投票描述</label>
+                        <textarea name="description" class="form-control" rows="3">{{ poll.description or '' }}</textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">截止时间</label>
+                        <input type="datetime-local" name="end_time" class="form-control"
+                            value="{{ poll.end_time.strftime('%Y-%m-%dT%H:%M') if poll.end_time else '' }}">
+                        <div class="form-text">留空表示永不截止</div>
+                    </div>
+                    <div class="mb-3">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" name="is_public" id="isPublic" {% if poll.is_public %}checked{% endif %}>
+                            <label class="form-check-label fw-semibold" for="isPublic">公开可见</label>
+                        </div>
+                    </div>
+                    <div class="mb-4">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" name="is_active" id="isActive" {% if poll.is_active %}checked{% endif %}>
+                            <label class="form-check-label fw-semibold" for="isActive">启用投票</label>
+                        </div>
+                    </div>
+
+                    <div class="alert alert-info">
+                        <i class="bi bi-info-circle me-2"></i>
+                        投票进行中时，选项内容不可修改（共 {{ poll.options|length }} 个选项，已获得 {{ poll.total_votes }} 票）
+                    </div>
+
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary px-4">
+                            <i class="bi bi-save me-1"></i>保存修改
+                        </button>
+                        <a href="{{ url_for('admin.polls') }}" class="btn btn-outline-secondary px-4">取消</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,127 @@
+/* ===== 全局样式 ===== */
+body {
+    background-color: #f8f9fa;
+    font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+}
+
+/* ===== 投票卡片 ===== */
+.poll-card {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    border-radius: 12px !important;
+}
+.poll-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.12) !important;
+}
+
+/* ===== 导航栏 ===== */
+.navbar {
+    border-bottom: 3px solid rgba(255,255,255,0.15);
+}
+.navbar-brand {
+    font-size: 1.3rem;
+    letter-spacing: 0.5px;
+}
+
+/* ===== 卡片样式 ===== */
+.card {
+    border-radius: 12px !important;
+}
+.card-header {
+    border-radius: 12px 12px 0 0 !important;
+    border-bottom: 1px solid rgba(0,0,0,0.06) !important;
+}
+
+/* ===== 投票选项 ===== */
+.option-label {
+    cursor: pointer;
+    border-radius: 8px !important;
+    margin-bottom: 8px;
+    transition: all 0.15s ease;
+    border: 2px solid #dee2e6 !important;
+}
+.option-label:hover {
+    border-color: #0d6efd !important;
+    background-color: #f0f5ff !important;
+}
+.option-label.active {
+    border-color: #0d6efd !important;
+    background-color: #e7f0ff !important;
+    font-weight: 600;
+}
+
+/* ===== 进度条 ===== */
+.progress {
+    border-radius: 10px;
+    background-color: #e9ecef;
+}
+.progress-bar {
+    border-radius: 10px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    transition: width 0.8s ease;
+}
+
+/* ===== 表格 ===== */
+.table th {
+    font-weight: 600;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #6c757d;
+}
+.table td {
+    vertical-align: middle;
+}
+
+/* ===== 按钮 ===== */
+.btn {
+    border-radius: 8px;
+    font-weight: 500;
+}
+.btn-lg {
+    border-radius: 10px;
+}
+
+/* ===== 表单 ===== */
+.form-control, .input-group-text {
+    border-radius: 8px !important;
+}
+.input-group .form-control {
+    border-radius: 0 8px 8px 0 !important;
+}
+.input-group .input-group-text:first-child {
+    border-radius: 8px 0 0 8px !important;
+}
+
+/* ===== 徽章 ===== */
+.badge {
+    font-weight: 500;
+    letter-spacing: 0.3px;
+}
+
+/* ===== Alert ===== */
+.alert {
+    border-radius: 10px;
+    border: none;
+}
+
+/* ===== 统计卡片 ===== */
+.card .display-5 {
+    font-size: 2.5rem;
+}
+
+/* ===== 页脚 ===== */
+footer {
+    font-size: 0.85rem;
+}
+
+/* ===== 响应式 ===== */
+@media (max-width: 768px) {
+    .display-4 { font-size: 2rem; }
+    .fs-2 { font-size: 1.4rem !important; }
+    .card-body { padding: 1.25rem !important; }
+}
+
+/* ===== 光标 ===== */
+.cursor-pointer { cursor: pointer; }

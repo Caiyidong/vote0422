@@ -1,0 +1,133 @@
+{% extends 'base.html' %}
+{% block title %}{{ poll.title }} - 投票结果{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <nav aria-label="breadcrumb" class="mb-3">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{{ url_for('vote.index') }}">首页</a></li>
+                <li class="breadcrumb-item"><a href="{{ url_for('vote.poll_detail', poll_id=poll.id) }}">{{ poll.title }}</a></li>
+                <li class="breadcrumb-item active">投票结果</li>
+            </ol>
+        </nav>
+
+        <div class="card shadow-sm border-0 mb-4">
+            <div class="card-header bg-primary text-white py-3">
+                <h4 class="mb-0 fw-bold"><i class="bi bi-bar-chart me-2"></i>{{ poll.title }}</h4>
+            </div>
+            <div class="card-body p-4">
+                <div class="row text-center mb-4 g-2">
+                    <div class="col-4">
+                        <div class="bg-light rounded p-3">
+                            <div class="fw-bold text-primary fs-3" id="totalVotes">{{ total }}</div>
+                            <small class="text-muted">总参与人数</small>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div class="bg-light rounded p-3">
+                            <div class="fw-bold text-primary fs-3">{{ poll.options|length }}</div>
+                            <small class="text-muted">候选选项</small>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div class="bg-light rounded p-3">
+                            <div class="fw-bold fs-3 {% if poll.is_expired %}text-secondary{% else %}text-success{% endif %}">
+                                {% if poll.is_expired %}已结束{% else %}进行中{% endif %}
+                            </div>
+                            <small class="text-muted">投票状态</small>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 图表 -->
+                <div class="row mb-4">
+                    <div class="col-md-6 mb-3 mb-md-0">
+                        <canvas id="barChart" height="250"></canvas>
+                    </div>
+                    <div class="col-md-6">
+                        <canvas id="pieChart" height="250"></canvas>
+                    </div>
+                </div>
+
+                <!-- 详细数据条 -->
+                <h6 class="fw-bold mb-3">详细数据</h6>
+                <div id="resultBars">
+                    {% for r in results %}
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between mb-1">
+                            <span class="fw-semibold">{{ r.content }}</span>
+                            <span class="text-muted">{{ r.votes }} 票 ({{ r.percent }}%)</span>
+                        </div>
+                        <div class="progress" style="height:20px">
+                            <div class="progress-bar progress-bar-striped" role="progressbar"
+                                style="width: {{ r.percent }}%">
+                                {% if r.percent > 10 %}{{ r.percent }}%{% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                {% if not poll.is_expired and poll.is_active %}
+                <div class="text-center mt-4">
+                    <small class="text-muted" id="refreshInfo">
+                        <i class="bi bi-arrow-clockwise me-1"></i>结果每30秒自动刷新
+                    </small>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="d-flex gap-2">
+            <a href="{{ url_for('vote.poll_detail', poll_id=poll.id) }}" class="btn btn-outline-primary">
+                <i class="bi bi-arrow-left me-1"></i>返回投票
+            </a>
+            <a href="{{ url_for('vote.index') }}" class="btn btn-outline-secondary">
+                <i class="bi bi-house me-1"></i>返回首页
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+const labels = {{ results | map(attribute='content') | list | tojson }};
+const votes  = {{ results | map(attribute='votes') | list | tojson }};
+const colors = ['#0d6efd','#6610f2','#198754','#fd7e14','#dc3545','#0dcaf0','#ffc107','#6c757d','#20c997','#d63384'];
+
+// 柱状图
+new Chart(document.getElementById('barChart'), {
+    type: 'bar',
+    data: {
+        labels,
+        datasets: [{ label: '票数', data: votes, backgroundColor: colors.slice(0, labels.length), borderRadius: 6 }]
+    },
+    options: { responsive: true, plugins: { legend: { display: false }, title: { display: true, text: '票数对比' } } }
+});
+
+// 饼图
+new Chart(document.getElementById('pieChart'), {
+    type: 'doughnut',
+    data: {
+        labels,
+        datasets: [{ data: votes, backgroundColor: colors.slice(0, labels.length) }]
+    },
+    options: { responsive: true, plugins: { title: { display: true, text: '票数占比' } } }
+});
+
+// 自动刷新（仅进行中）
+{% if not poll.is_expired and poll.is_active %}
+setInterval(() => {
+    fetch('/api/poll/{{ poll.id }}/result')
+        .then(r => r.json())
+        .then(data => {
+            document.getElementById('totalVotes').textContent = data.total;
+            document.getElementById('refreshInfo').innerHTML =
+                '<i class="bi bi-check-circle text-success me-1"></i>已刷新 - ' + new Date().toLocaleTimeString();
+        });
+}, 30000);
+{% endif %}
+</script>
+{% endblock %}

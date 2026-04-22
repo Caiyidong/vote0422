@@ -1,0 +1,100 @@
+{% extends 'base.html' %}
+{% block title %}管理后台 - 数据看板{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h3 class="fw-bold mb-0"><i class="bi bi-speedometer2 me-2 text-primary"></i>数据看板</h3>
+    <a href="{{ url_for('admin.create_poll') }}" class="btn btn-primary">
+        <i class="bi bi-plus-lg me-1"></i>创建投票
+    </a>
+</div>
+
+<!-- 统计卡片 -->
+<div class="row g-3 mb-4">
+    <div class="col-sm-6 col-lg-3">
+        <div class="card border-0 shadow-sm text-white bg-primary">
+            <div class="card-body d-flex align-items-center gap-3">
+                <i class="bi bi-list-check display-5 opacity-75"></i>
+                <div>
+                    <div class="fs-2 fw-bold">{{ total_polls }}</div>
+                    <div class="small">总投票数</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-lg-3">
+        <div class="card border-0 shadow-sm text-white bg-success">
+            <div class="card-body d-flex align-items-center gap-3">
+                <i class="bi bi-play-circle display-5 opacity-75"></i>
+                <div>
+                    <div class="fs-2 fw-bold">{{ active_polls }}</div>
+                    <div class="small">进行中</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-lg-3">
+        <div class="card border-0 shadow-sm text-white bg-info">
+            <div class="card-body d-flex align-items-center gap-3">
+                <i class="bi bi-people display-5 opacity-75"></i>
+                <div>
+                    <div class="fs-2 fw-bold">{{ total_users }}</div>
+                    <div class="small">注册用户</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-lg-3">
+        <div class="card border-0 shadow-sm text-white bg-warning">
+            <div class="card-body d-flex align-items-center gap-3">
+                <i class="bi bi-hand-index display-5 opacity-75"></i>
+                <div>
+                    <div class="fs-2 fw-bold">{{ total_votes }}</div>
+                    <div class="small">总投票次数</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 最近投票 -->
+<div class="card shadow-sm border-0">
+    <div class="card-header bg-white border-0 pt-3 d-flex justify-content-between align-items-center">
+        <span class="fw-bold"><i class="bi bi-clock-history me-2"></i>最近创建的投票</span>
+        <a href="{{ url_for('admin.polls') }}" class="btn btn-sm btn-outline-primary">查看全部</a>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>标题</th><th>状态</th><th>总票数</th><th>创建时间</th><th>操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for poll in recent_polls %}
+                    <tr>
+                        <td class="fw-semibold">{{ poll.title }}</td>
+                        <td>
+                            {% if not poll.is_active %}
+                                <span class="badge bg-secondary">已关闭</span>
+                            {% elif poll.is_expired %}
+                                <span class="badge bg-danger">已截止</span>
+                            {% else %}
+                                <span class="badge bg-success">进行中</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ poll.total_votes }}</td>
+                        <td><small class="text-muted">{{ poll.created_at.strftime('%m-%d %H:%M') }}</small></td>
+                        <td>
+                            <a href="{{ url_for('vote.poll_result', poll_id=poll.id) }}" class="btn btn-sm btn-outline-info">结果</a>
+                            <a href="{{ url_for('admin.edit_poll', poll_id=poll.id) }}" class="btn btn-sm btn-outline-secondary">编辑</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
